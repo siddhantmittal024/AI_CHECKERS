@@ -4,17 +4,18 @@ import minimax from "./minimax";
 import Piece from "./piece";
 import "./board.css";
 
+
 //[0 M 0 M 0 M 0 M
 // M 0 M 0 M 0 M 0
 // 0 M 0 M 0 M 0 M
 // 0 0 0 0 0 0 0 0
-// 0 0 0 0 0 0 0 0
+// 0 0 0 0 0 0 0 0 
 // B 0 B 0 B 0 B 0
 // 0 B 0 B 0 B 0 B
 // B 0 B 0 B 0 B 0]
 
 export default class Board extends Component {
-  state = {
+  state = { 
     //initial board
     board: [
       [
@@ -99,13 +100,13 @@ export default class Board extends Component {
       ],
     ],
     //p1 or p2
-    turn: 1,
+    turn: 1, 
     possibleMove: [],
     possibleJumpMove: [],
     clickedBefore: [],
     clickedNow: [],
-    piecePlayerBlue: 12, //number of blue pieces
-    piecePlayerRed: 12, //number of red pieces
+    piecePlayerBlue: 12,//number of blue pieces
+    piecePlayerRed: 12,//number of red pieces
     winner: "",
     player: null,
     level: null,
@@ -118,13 +119,13 @@ export default class Board extends Component {
       clickedNow: [row, column],
     });
     //execution of the game begins here
-    //pass the updated state into execute function
+    //pass the updated state into execute functi
     this.boardExecute();
   };
 
   boardExecute = async () => {
     let newState = execute(this.state);
-    await this.setState({ ...newState });
+    await this.setState({...newState });
 
     if (await this.checkWin()) {
       return;
@@ -180,12 +181,12 @@ export default class Board extends Component {
           >
             {column.color === "M" && (
               <div className="red piece">
-                {column.isKing && <div className="king" />}
+                {column.isKing && <div className="king1" />}
               </div>
             )}
             {column.color === "B" && (
               <div className="blue piece">
-                {column.isKing && <div className="king" />}
+                {column.isKing && <div className="king2" />}
               </div>
             )}
           </div>

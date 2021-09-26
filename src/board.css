@@ -1,5 +1,5 @@
 body {
-  background: #ccc;
+  background: #aeb9df;
 }
 
 .board {
@@ -28,19 +28,19 @@ body {
 }
 
 .player-turn .player-1 {
-  color: blue;
+  color: #6FC4CA;
 }
 
 .player-turn .player-2 {
-  color: red;
+  color: #EB8181;
 }
 
 .player-turn .vs-piece .red {
-  color: red;
+  color: #EB8181;
 }
 
 .player-turn .vs-piece .blue {
-  color: blue;
+  color: #6FC4CA;
 }
 
 .player-turn .new-game {
@@ -56,15 +56,16 @@ body {
 .column {
   width: 80px;
   height: 80px;
-  background: black;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .row:nth-child(odd) .column:nth-child(odd),
 .row:nth-child(even) .column:nth-child(even) {
-  background: white;
+  background: rgb(145, 139, 137);;
 }
 
 /* .column.clicked {
@@ -72,25 +73,35 @@ body {
 } */
 
 .piece {
-  width: 50px;
-  height: 50px; 
-  border-radius: 50%;
-  object-fit: cover;
+  width: 60px;
+  height: 60px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .piece.red {
   background-image: url('img/soldier1.png');
+  background-repeat: no-repeat;
 }
 
 .piece.blue {
-  background: blue;
+  background-image: url('img/soldier2.png');
+  background-repeat: no-repeat;
 }
 
-.king {
-  width: 30px;
-  height: 30px;
-  background: yellow;
-  border-radius: 50%;
+.king1 {
+  background-image: url('img/king1.png');
+  background-repeat: no-repeat;
+  width: 60px;
+  height: 60px;
+}
+
+.king2 {
+  background-image: url('img/king2.png');
+  background-repeat: no-repeat;
+  width: 60px;
+  height: 60px;
 }
 
 .choose {
