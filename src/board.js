@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import execute, { getPossibleClick } from "./utils";
-import minimax from "./minimax";
 import Piece from "./piece";
 import "./board.css";
-import { Row } from "./component/BoardSquares";
 import executeComputerMove from "./minimax";
 
 //[0 M 0 M 0 M 0 M
@@ -131,7 +129,7 @@ export default class Board extends Component {
 
     //console.log(this.state.board[0][0].color);
 
-    console.log(this.state.possibleMove);
+    //console.log(this.state.possibleMove);
     if (this.state.possibleMove != null) {
       //this.highlightPossibleMove();
     }
@@ -158,6 +156,8 @@ export default class Board extends Component {
         if (await this.checkWin()) {
           return;
         }
+
+        //break;
       }
     }, 1500);
 
@@ -222,7 +222,6 @@ export default class Board extends Component {
                 className="column"
                 onClick={() => {
                   this.handleClick(rowIdx, columnIdx);
-                  console.log(this.state.possibleMove);
                 }}
                 id={`column${columnIdx}`}
               >
@@ -256,6 +255,7 @@ export default class Board extends Component {
     if (this.state.player === null) {
       return (
         <div className="choose">
+          <h1 className="heading">Checkers AI</h1>
           <div className="button">
             <button onClick={() => this.changeNumberOfPlayer(1)}>
               1 Player
@@ -284,8 +284,6 @@ export default class Board extends Component {
         </div>
       );
     }
-
-    console.log(this.state);
 
     return (
       <>

@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import Piece from "./piece";
 
 export default function execute(oldState) {
@@ -24,8 +25,7 @@ export function getNextStateBoard(oldState) {
   if (
     (piece === "0" && clickedBefore.length === 0) ||
     (piece === "B" && turn !== 1) ||
-    (piece === "M" && turn !== 2) ||
-    piece === "h"
+    (piece === "M" && turn !== 2)
   ) {
     return state;
   }
@@ -273,6 +273,25 @@ export function checkKing(board) {
   }
 
   return newBoard;
+}
+
+export function numberOfKings(board) {
+  let redKings = 0,
+    blueKings = 0;
+
+  board.map((row, idx) => {
+    row.map((column) => {
+      if (column.isKing) {
+        if (column.color === "M") {
+          redKings += 1;
+        } else {
+          blueKings += 1;
+        }
+      }
+    });
+  });
+
+  return [redKings, blueKings];
 }
 
 export function getPossibleClick(piece, board) {

@@ -1,12 +1,11 @@
-import execute, { getPossibleClick } from "./utils";
+import execute, { getPossibleClick, numberOfKings } from "./utils";
 
 //Alter function executeMiniMax
 export default function executeComputerMove(oldState) {
   const { level } = oldState;
   let depth;
-
   if (level === "Random") {
-    depth = 0;
+    return Random(oldState);
   } else if (level === "Mini-Max") {
     depth = 3;
     return miniMax(oldState, depth);
@@ -14,6 +13,68 @@ export default function executeComputerMove(oldState) {
     depth = 4;
     return alphaBetaPruning(oldState, depth, -10000, 10000);
   }
+
+  return oldState;
+}
+
+function Random(oldState) {
+  const state = JSON.parse(JSON.stringify(oldState));
+  const possibleClick = getPossibleClick("M", state.board);
+
+  if (possibleClick.length === 0) {
+    return { nextState: state };
+  }
+
+  let possibleState = [];
+
+  for (let ii = 0; ii < possibleClick.length; ii++) {
+    const moveState = JSON.parse(JSON.stringify(state));
+    moveState.clickedNow = possibleClick[ii];
+
+    const next = execute(moveState);
+    const possibleJumpMove = next.possibleJumpMove;
+    const possibleMove = next.possibleMove;
+
+    // check if normal move
+    if (possibleJumpMove.length === 0) {
+      for (let jj = 0; jj < possibleMove.length; jj++) {
+        const jumpState = JSON.parse(JSON.stringify(next));
+        jumpState.clickedNow = possibleMove[jj];
+
+        let result = execute(jumpState);
+        // add possible next state
+        possibleState.push({
+          nextState: result,
+        });
+      }
+    } else {
+      // for jump move
+
+      for (let jj = 0; jj < possibleJumpMove.length; jj++) {
+        const jumpState = JSON.parse(JSON.stringify(next));
+        jumpState.clickedNow = possibleJumpMove[jj];
+
+        let result = execute(jumpState);
+
+        // check if can jump more than once
+        while (result.turn === 2) {
+          //console.log("RESULT:", result);
+          result.clickedNow = result.possibleJumpMove[0];
+          result = execute(result);
+        }
+
+        // add all possible move state
+        possibleState.push({
+          nextState: result,
+        });
+      }
+    }
+
+  }
+
+  const randomState = Math.floor(Math.random() * possibleState.length);
+
+  return possibleState[randomState].nextState;
 
 }
 
@@ -25,6 +86,8 @@ function miniMax(oldState, depth) {
 function max(oldState, depth) {
   const state = JSON.parse(JSON.stringify(oldState));
   const possibleClick = getPossibleClick("M", state.board);
+
+  const kings = numberOfKings(state.board);
 
   // check if there is not possible move
   if (possibleClick.length === 0) {
@@ -82,7 +145,6 @@ function max(oldState, depth) {
 
         // check if can jump more than once
         while (result.turn === 2) {
-          console.log("RESULT:", result);
           result.clickedNow = result.possibleJumpMove[0];
           result = execute(result);
         }
@@ -91,7 +153,11 @@ function max(oldState, depth) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerRed - result.piecePlayerBlue;
+          value =
+            result.piecePlayerRed -
+            result.piecePlayerBlue +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMin = min(result, depth - 1);
 
@@ -125,9 +191,10 @@ function max(oldState, depth) {
 }
 
 function min(oldState, depth) {
-  console.log("min", depth, "loading");
+  //console.log("min", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
   const possibleClick = getPossibleClick("B", state.board);
+  const kings = numberOfKings(state.board);
 
   // check if there is not possible move
   if (possibleClick.length === 0) {
@@ -156,7 +223,11 @@ function min(oldState, depth) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerBlue - result.piecePlayerRed;
+          value =
+            result.piecePlayerBlue -
+            result.piecePlayerRed +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMax = max(result, depth - 1);
 
@@ -240,6 +311,7 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
   //console.log("max", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
   const possibleClick = getPossibleClick("M", state.board);
+  const kings = numberOfKings(state.board);
 
   // check if there is not possible move
   if (possibleClick.length === 0) {
@@ -268,7 +340,11 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerRed - result.piecePlayerBlue;
+          value =
+            result.piecePlayerRed -
+            result.piecePlayerBlue +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMin = alphaMin(result, depth - 1, alpha, beta);
 
@@ -307,7 +383,7 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 
         // check if can jump more than once
         while (result.turn === 2) {
-          console.log("RESULT:", result);
+          //console.log("RESULT:", result);
           result.clickedNow = result.possibleJumpMove[0];
           result = execute(result);
         }
@@ -316,7 +392,11 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerRed - result.piecePlayerBlue;
+          value =
+            result.piecePlayerRed -
+            result.piecePlayerBlue +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMin = alphaMin(result, depth - 1, alpha, beta);
 
@@ -360,9 +440,10 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 }
 
 function alphaMin(oldState, depth = 0, alpha, beta) {
-  console.log("min", depth, "loading");
+  //console.log("min", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
   const possibleClick = getPossibleClick("B", state.board);
+  const kings = numberOfKings(state.board);
 
   // check if there is not possible move
   if (possibleClick.length === 0) {
@@ -391,7 +472,11 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerBlue - result.piecePlayerRed;
+          value =
+            result.piecePlayerBlue -
+            result.piecePlayerRed +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMax = alphaMax(result, depth - 1, alpha, beta);
 
@@ -440,7 +525,11 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerBlue - result.piecePlayerRed;
+          value =
+            result.piecePlayerBlue -
+            result.piecePlayerRed +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMax = alphaMax(result, depth - 1, alpha, beta);
 
