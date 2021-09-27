@@ -1,24 +1,40 @@
 import execute, { getPossibleClick } from "./utils";
 
-export default function executeMinimax(oldState) {
+//Alter function executeMiniMax
+export default function executeComputerMove(oldState) {
   const { level } = oldState;
   let depth;
 
   // check level for set depth of minimax
-  if (level === "easy") {
+  if (level === "Random") {
     depth = 0;
-  } else if (level === "medium") {
-    depth = 2;
-  } else if (level === "hard") {
+  } else if (level === "Mini-Max") {
+    depth = 3;
+    return miniMax(oldState, depth);
+  } else if (level === "Alpha-Beta") {
     depth = 4;
+    return alphaBetaPruning(oldState, depth, -10000, 10000);
   }
 
-  const nextState = max(oldState, depth, -1000, 1000);
+  //const nextState = max(oldState, depth, -1000, 1000);
+  //return nextState.nextState;
+}
+
+function miniMax(oldState, depth) {
+  const nextState = max(oldState, depth);
   return nextState.nextState;
 }
 
+function alphaBetaPruning(oldState, depth, Alpha, Beta) {
+  const nextState = max(oldState, depth, Alpha, Beta);
+  return nextState.nextState;
+}
+//ADD RANDOM FUNCTION
+//ADD ALPHA BETA PRUNING
+
+//function maxMiniMax(oldState, depth) {}
 function max(oldState, depth = 0, alpha, beta) {
-  console.log("max", depth, "loading");
+  //console.log("max", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
   const possibleClick = getPossibleClick("M", state.board);
 
@@ -60,15 +76,16 @@ function max(oldState, depth = 0, alpha, beta) {
 
           value = resMin.value;
         }
-
         // prunning
-        if (value > alpha) {
-          alpha = value;
-        }
 
-        if (beta <= alpha) {
-          break;
-        }
+        //67-74 I think we can remove to make it purely min-max
+        //  if (value > alpha) {
+        //    alpha = value;
+        //  }
+
+        //  if (beta <= alpha) {
+        //    break;
+        //  }
 
         // add possible next state
         possibleState.push({
@@ -87,6 +104,7 @@ function max(oldState, depth = 0, alpha, beta) {
 
         // check if can jump more than once
         while (result.turn === 2) {
+          console.log("RESULT:", result);
           result.clickedNow = result.possibleJumpMove[0];
           result = execute(result);
         }
@@ -108,13 +126,14 @@ function max(oldState, depth = 0, alpha, beta) {
         }
 
         // pruning
-        if (value > alpha) {
-          alpha = value;
-        }
+        //Lines 115-121 can be removes to make it purely min-max
+        //  if (value > alpha) {
+        //    alpha = value;
+        //  }
 
-        if (beta <= alpha) {
-          break;
-        }
+        //  if (beta <= alpha) {
+        //    break;
+        //  }
 
         // add all possible move state
         possibleState.push({
@@ -126,6 +145,7 @@ function max(oldState, depth = 0, alpha, beta) {
   }
 
   // randomize all
+  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
   // sort descending by move value
@@ -181,13 +201,14 @@ function min(oldState, depth = 0, alpha, beta) {
         }
 
         // prunning
-        if (value < beta) {
-          beta = value;
-        }
+        //remove lines 189-197 to make it min-max
+        // if (value < beta) {
+        //  beta = value;
+        //}
 
-        if (beta <= alpha) {
-          break;
-        }
+        // if (beta <= alpha) {
+        //   break;
+        // }
 
         // add possible next state
         possibleState.push({
@@ -229,13 +250,13 @@ function min(oldState, depth = 0, alpha, beta) {
         }
 
         // pruning
-        if (value < beta) {
-          beta = value;
-        }
+        // if (value < beta) {
+        //   beta = value;
+        // }
 
-        if (beta <= alpha) {
-          break;
-        }
+        // if (beta <= alpha) {
+        //   break;
+        // }
 
         // add all possible move state
         possibleState.push({
@@ -247,6 +268,7 @@ function min(oldState, depth = 0, alpha, beta) {
   }
 
   // randomize all
+  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
   // sort ascending by move value

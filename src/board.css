@@ -1,29 +1,33 @@
 body {
-  background: #aeb9df;
+  /*#aeb9df #cee9f3 #f5fad9*/
+  background:#aeb9df ;
 }
-
+/*640*/
 .board {
-  height: 640px;
-  width: 640px;
-  border: 20px solid #555;
+  height: 560px;
+  width: 560px;
+  border: 7px solid #555;
   position: relative;
 }
 
 .player-turn {
+  background-color: white;
+  text-align: center;
   width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: auto auto auto;
 }
 
-.player-turn h1 {
+.player-turn h2 {
   background: #fff;
   margin: 0;
   padding: 8px 16px;
-  border: 20px solid #555;
+  border: 7px solid #555;
   border-bottom: none;
 }
 
-.player-turn h1:not(:first-child) {
+.player-turn h2:not(:first-child) {
   border-left: none;
 }
 
@@ -50,12 +54,12 @@ body {
 .row {
   display: flex;
   width: 100%;
-  height: 80px;
+  height: 70px;
 }
 
 .column {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   background: white;
   display: flex;
   justify-content: center;
@@ -105,9 +109,9 @@ body {
 }
 
 .choose {
-  background: #fff;
+  /*background: #fff;*/
   text-align: center;
-  border: 20px solid #555;
+  border: 2px solid rgb(255, 255, 255);
   padding: 32px;
 }
 
@@ -120,19 +124,23 @@ body {
 }
 
 .choose .button button {
-  background: white;
-  border: 4px solid;
+  background: #aeb9df;
+  border: 2px solid;
   padding: 8px;
   cursor: pointer;
   margin: 8px;
   font-size: 20px;
-  color: yellow;
+  color: rgb(255, 255, 255);
 }
-
+.select_level
+{
+  color: white;
+  font-weight: normal;
+}
 .choose .button button:first-child {
-  color: blue;
+  color: #ffffff;
 }
 
 .choose .button button:last-child {
-  color: red;
+  color: #ffffff;
 }

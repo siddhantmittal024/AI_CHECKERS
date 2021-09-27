@@ -14,7 +14,7 @@ export function getNextStateBoard(oldState) {
     clickedNow,
     clickedBefore,
     possibleMove,
-    possibleJumpMove
+    possibleJumpMove,
   } = state;
   const [row, column] = clickedNow;
   const piece = board[row][column].color;
@@ -24,7 +24,8 @@ export function getNextStateBoard(oldState) {
   if (
     (piece === "0" && clickedBefore.length === 0) ||
     (piece === "B" && turn !== 1) ||
-    (piece === "M" && turn !== 2)
+    (piece === "M" && turn !== 2) ||
+    piece === "h"
   ) {
     return state;
   }
@@ -34,7 +35,7 @@ export function getNextStateBoard(oldState) {
     const possibleClick = getPossibleClick(piece, board);
 
     // check if piece clicked is possible to move or not
-    if (possibleClick.find(el => el[0] === row && el[1] === column)) {
+    if (possibleClick.find((el) => el[0] === row && el[1] === column)) {
       state.clickedBefore = [row, column];
       state.clickedNow = [];
       state.possibleMove = checkPossibleMove(row, column, piece, isKing, board);
@@ -67,7 +68,7 @@ export function getNextStateBoard(oldState) {
   // force jump if can jump
   if (possibleJumpMove.length > 0) {
     const canJump = possibleJumpMove.find(
-      el => el[0] === row && el[1] === column
+      (el) => el[0] === row && el[1] === column
     );
 
     // check if move for jump is valid
@@ -115,7 +116,7 @@ export function getNextStateBoard(oldState) {
     return state;
   }
 
-  if (possibleMove.find(el => el[0] === row && el[1] === column)) {
+  if (possibleMove.find((el) => el[0] === row && el[1] === column)) {
     const newBoard = JSON.parse(JSON.stringify(board));
     newBoard[row][column] = board[rowBefore][columnBefore];
     newBoard[rowBefore][columnBefore] = new Piece("0");
