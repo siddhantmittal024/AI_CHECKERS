@@ -9,13 +9,22 @@ body {
   font-weight: bold;
 }
 
-
-/*640*/
+/*520*/
 .board {
   height: 520px;
   width: 520px;
   border: 7px solid #555;
   position: relative;
+}
+
+.player-turn-1 {
+  background-color: white;
+  text-align: center;
+  width: 97.4%;
+  height: 100%;
+  display: grid;
+  border: 7px solid #555;
+  border-bottom: none;
 }
 
 .player-turn {
@@ -24,7 +33,15 @@ body {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto;
+}
+
+.player-turn-1 .player-1 {
+  color: #6FC4CA;
+}
+
+.player-turn-1 .player-2 {
+  color: #EB8181;
 }
 
 .player-turn h2 {

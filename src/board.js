@@ -99,7 +99,7 @@ export default class Board extends Component {
     bluePiecesLeft: 12, //number of blue pieces
     redPiecesLeft: 12, //number of red pieces
     winner: "",
-    player: 1,
+    player: 1,   //make it null to make it a 2 player game
     level: null,
   };
   /**
@@ -115,7 +115,7 @@ export default class Board extends Component {
     });
 
     //execution of the game begins here
-    //pass the updated state into execute functi
+    //pass the updated state into execute function
     await this.boardExecute();
 
     //console.log(this.state.board[0][0].color);
@@ -147,7 +147,6 @@ export default class Board extends Component {
         if (await this.checkWin()) {
           return;
         }
-
         //break;
       }
     }, 1500);
@@ -238,7 +237,7 @@ export default class Board extends Component {
     this.setState({ player: number });
   };
 
-  changeLevel = (level) => {
+  updateLevel = (level) => {
     this.setState({ level: level });
   };
 
@@ -265,11 +264,11 @@ export default class Board extends Component {
           <h1 className="heading">CHECKERS AI</h1>
           <h2 class="select_level">Select Level</h2>
           <div className="button">
-            <button onClick={() => this.changeLevel("Random")}>Random</button>
-            <button onClick={() => this.changeLevel("Mini-Max")}>
+            <button onClick={() => this.updateLevel("Random")}>Random</button>
+            <button onClick={() => this.updateLevel("Mini-Max")}>
               Mini-Max
             </button>
-            <button onClick={() => this.changeLevel("Alpha-Beta")}>
+            <button onClick={() => this.updateLevel("Alpha-Beta")}>
               Alpha Beta
             </button>
           </div>
@@ -279,17 +278,19 @@ export default class Board extends Component {
 
     return (
       <>
+        <div className="player-turn-1">
+          <h2 className={`player-${this.state.turn}`}>
+            {this.state.winner
+              ? `${this.state.winner} Win`
+              : `Player ${this.state.turn} Turn`}
+          </h2>
+        </div>
         <div className="board">{this.renderBoard(this.state.board)}</div>
         <div className="player-turn">
           <h2 className="vs-piece">
             <span className="blue">{this.state.bluePiecesLeft}</span>
             <span> VS </span>
             <span className="red">{this.state.redPiecesLeft}</span>
-          </h2>
-          <h2 className={`player-${this.state.turn}`}>
-            {this.state.winner
-              ? `${this.state.winner} Win`
-              : `Player ${this.state.turn} Turn`}
           </h2>
           <h2
             onClick={() => {

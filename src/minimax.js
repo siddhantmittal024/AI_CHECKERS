@@ -69,13 +69,11 @@ function Random(oldState) {
         });
       }
     }
-
   }
 
   const randomState = Math.floor(Math.random() * possibleState.length);
 
   return possibleState[randomState].nextState;
-
 }
 
 function miniMax(oldState, depth) {
@@ -116,7 +114,12 @@ function max(oldState, depth) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerRed - result.piecePlayerBlue;
+          value =
+            result.piecePlayerRed -
+            kings[0] -
+            (result.piecePlayerBlue - kings[1]) +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMin = min(result, depth - 1);
 
@@ -155,7 +158,8 @@ function max(oldState, depth) {
         if (depth === 0) {
           value =
             result.piecePlayerRed -
-            result.piecePlayerBlue +
+            kings[0] -
+            (result.piecePlayerBlue - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
@@ -225,7 +229,8 @@ function min(oldState, depth) {
         if (depth === 0) {
           value =
             result.piecePlayerBlue -
-            result.piecePlayerRed +
+            kings[1] -
+            (result.piecePlayerRed - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
@@ -266,7 +271,12 @@ function min(oldState, depth) {
 
         // set value
         if (depth === 0) {
-          value = result.piecePlayerBlue - result.piecePlayerRed;
+          value =
+            result.piecePlayerBlue -
+            kings[1] -
+            (result.piecePlayerRed - kings[0]) +
+            kings[0] * 2 -
+            kings[1] * 2;
         } else {
           const resMax = max(result, depth - 1);
 
@@ -342,7 +352,8 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
         if (depth === 0) {
           value =
             result.piecePlayerRed -
-            result.piecePlayerBlue +
+            kings[0] -
+            (result.piecePlayerBlue - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
@@ -394,7 +405,8 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
         if (depth === 0) {
           value =
             result.piecePlayerRed -
-            result.piecePlayerBlue +
+            kings[0] -
+            (result.piecePlayerBlue - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
@@ -474,7 +486,8 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
         if (depth === 0) {
           value =
             result.piecePlayerBlue -
-            result.piecePlayerRed +
+            kings[1] -
+            (result.piecePlayerRed - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
@@ -527,7 +540,8 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
         if (depth === 0) {
           value =
             result.piecePlayerBlue -
-            result.piecePlayerRed +
+            kings[1] -
+            (result.piecePlayerRed - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
