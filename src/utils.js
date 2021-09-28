@@ -24,8 +24,8 @@ export function getNextStateBoard(oldState) {
   // check valid click
   if (
     (piece === "0" && clickedBefore.length === 0) ||
-    (piece === "B" && turn !== 1) ||
-    (piece === "M" && turn !== 2)
+    (piece === "b" && turn !== 1) ||
+    (piece === "r" && turn !== 2)
   ) {
     return state;
   }
@@ -137,7 +137,7 @@ export function getNextStateBoard(oldState) {
 export function checkPossibleMove(row, column, piece, isKing, board) {
   const move = [];
 
-  if (piece === "B" || isKing) {
+  if (piece === "b" || isKing) {
     if (
       row - 1 >= 0 &&
       column - 1 >= 0 &&
@@ -154,7 +154,7 @@ export function checkPossibleMove(row, column, piece, isKing, board) {
     }
   }
 
-  if (piece === "M" || isKing) {
+  if (piece === "r" || isKing) {
     if (
       row + 1 <= 7 &&
       column - 1 >= 0 &&
@@ -176,11 +176,11 @@ export function checkPossibleMove(row, column, piece, isKing, board) {
 
 export function checkPossibleJumpMove(row, column, piece, isKing, board) {
   const move = [];
-  if (piece === "B") {
+  if (piece === "b") {
     if (
       row - 2 >= 0 &&
       column - 2 >= 0 &&
-      board[row - 1][column - 1].color === "M" &&
+      board[row - 1][column - 1].color === "r" &&
       board[row - 2][column - 2].color === "0"
     ) {
       move.push([row - 2, column - 2, row - 1, column - 1]);
@@ -188,7 +188,7 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
     if (
       row - 2 >= 0 &&
       column + 2 <= 7 &&
-      board[row - 1][column + 1].color === "M" &&
+      board[row - 1][column + 1].color === "r" &&
       board[row - 2][column + 2].color === "0"
     ) {
       move.push([row - 2, column + 2, row - 1, column + 1]);
@@ -198,7 +198,7 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
       if (
         row + 2 <= 7 &&
         column - 2 >= 0 &&
-        board[row + 1][column - 1].color === "M" &&
+        board[row + 1][column - 1].color === "r" &&
         board[row + 2][column - 2].color === "0"
       ) {
         move.push([row + 2, column - 2, row + 1, column - 1]);
@@ -207,18 +207,18 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
         row + 2 <= 7 &&
         column + 2 <= 7 &&
         board[row + 2][column + 2].color === "0" &&
-        board[row + 1][column + 1].color === "M"
+        board[row + 1][column + 1].color === "r"
       ) {
         move.push([row + 2, column + 2, row + 1, column + 1]);
       }
     }
   }
 
-  if (piece === "M") {
+  if (piece === "r") {
     if (
       row + 2 <= 7 &&
       column - 2 >= 0 &&
-      board[row + 1][column - 1].color === "B" &&
+      board[row + 1][column - 1].color === "b" &&
       board[row + 2][column - 2].color === "0"
     ) {
       move.push([row + 2, column - 2, row + 1, column - 1]);
@@ -227,7 +227,7 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
       row + 2 <= 7 &&
       column + 2 <= 7 &&
       board[row + 2][column + 2].color === "0" &&
-      board[row + 1][column + 1].color === "B"
+      board[row + 1][column + 1].color === "b"
     ) {
       move.push([row + 2, column + 2, row + 1, column + 1]);
     }
@@ -236,7 +236,7 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
       if (
         row - 2 >= 0 &&
         column - 2 >= 0 &&
-        board[row - 1][column - 1].color === "B" &&
+        board[row - 1][column - 1].color === "b" &&
         board[row - 2][column - 2].color === "0"
       ) {
         move.push([row - 2, column - 2, row - 1, column - 1]);
@@ -244,7 +244,7 @@ export function checkPossibleJumpMove(row, column, piece, isKing, board) {
       if (
         row - 2 >= 0 &&
         column + 2 <= 7 &&
-        board[row - 1][column + 1].color === "B" &&
+        board[row - 1][column + 1].color === "b" &&
         board[row - 2][column + 2].color === "0"
       ) {
         move.push([row - 2, column + 2, row - 1, column + 1]);
@@ -261,13 +261,13 @@ export function checkKing(board) {
   const lastRow = newBoard[7];
 
   for (let ii = 0; ii < firstRow.length; ii++) {
-    if (firstRow[ii].color === "B") {
+    if (firstRow[ii].color === "b") {
       firstRow[ii].isKing = true;
     }
   }
 
   for (let ii = 0; ii < lastRow.length; ii++) {
-    if (lastRow[ii].color === "M") {
+    if (lastRow[ii].color === "r") {
       lastRow[ii].isKing = true;
     }
   }
@@ -282,7 +282,7 @@ export function numberOfKings(board) {
   board.map((row, idx) => {
     row.map((column) => {
       if (column.isKing) {
-        if (column.color === "M") {
+        if (column.color === "r") {
           redKings += 1;
         } else {
           blueKings += 1;

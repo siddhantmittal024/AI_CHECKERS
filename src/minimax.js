@@ -19,7 +19,7 @@ export default function executeComputerMove(oldState) {
 
 function Random(oldState) {
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("M", state.board);
+  const possibleClick = getPossibleClick("r", state.board);
 
   if (possibleClick.length === 0) {
     return { nextState: state };
@@ -85,7 +85,7 @@ function miniMax(oldState, depth) {
 
 function max(oldState, depth) {
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("M", state.board);
+  const possibleClick = getPossibleClick("r", state.board);
 
   const kings = numberOfKings(state.board);
 
@@ -193,7 +193,7 @@ function max(oldState, depth) {
 function min(oldState, depth) {
   //console.log("min", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("B", state.board);
+  const possibleClick = getPossibleClick("b", state.board);
   const kings = numberOfKings(state.board);
 
   // check if there is not possible move
@@ -310,7 +310,7 @@ function alphaBetaPruning(oldState, depth, Alpha, Beta) {
 function alphaMax(oldState, depth = 0, alpha, beta) {
   //console.log("max", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("M", state.board);
+  const possibleClick = getPossibleClick("r", state.board);
   const kings = numberOfKings(state.board);
 
   // check if there is not possible move
@@ -442,7 +442,7 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 function alphaMin(oldState, depth = 0, alpha, beta) {
   //console.log("min", depth, "loading");
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("B", state.board);
+  const possibleClick = getPossibleClick("b", state.board);
   const kings = numberOfKings(state.board);
 
   // check if there is not possible move

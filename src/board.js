@@ -4,48 +4,39 @@ import Piece from "./piece";
 import "./board.css";
 import executeComputerMove from "./minimax";
 
-//[0 M 0 M 0 M 0 M
-// M 0 M 0 M 0 M 0
-// 0 M 0 M 0 M 0 M
-// 0 0 0 0 0 0 0 0
-// 0 0 0 0 0 0 0 0
-// B 0 B 0 B 0 B 0
-// 0 B 0 B 0 B 0 B
-// B 0 B 0 B 0 B 0]
-
 export default class Board extends Component {
   state = {
     //initial board
     board: [
       [
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
       ],
       [
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
       ],
       [
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
         new Piece("0"),
-        new Piece("M"),
+        new Piece("r"),
       ],
 
       [
@@ -69,33 +60,33 @@ export default class Board extends Component {
         new Piece("0"),
       ],
       [
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
       ],
       [
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
       ],
       [
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
-        new Piece("B"),
+        new Piece("b"),
         new Piece("0"),
       ],
     ],
@@ -105,10 +96,10 @@ export default class Board extends Component {
     possibleJumpMove: [],
     clickedBefore: [],
     clickedNow: [],
-    piecePlayerBlue: 12, //number of blue pieces
-    piecePlayerRed: 12, //number of red pieces
+    bluePiecesLeft: 12, //number of blue pieces
+    redPiecesLeft: 12, //number of red pieces
     winner: "",
-    player: null,
+    player: 1,
     level: null,
   };
   /**
@@ -167,16 +158,16 @@ export default class Board extends Component {
   };
 
   checkWin = async () => {
-    const { piecePlayerBlue, piecePlayerRed, turn } = this.state;
+    const { bluePiecesLeft, redPiecesLeft, turn } = this.state;
     const possibleClick = getPossibleClick(
-      turn === 1 ? "B" : "M",
+      turn === 1 ? "b" : "r",
       this.state.board
     );
 
-    if (piecePlayerBlue === 0) {
+    if (bluePiecesLeft === 0) {
       await this.setState({ winner: "Player 2" });
       return true;
-    } else if (piecePlayerRed === 0) {
+    } else if (redPiecesLeft === 0) {
       await this.setState({ winner: "Player 1" });
       return true;
     } else if (possibleClick.length === 0) {
@@ -206,31 +197,31 @@ export default class Board extends Component {
   // };
 
   renderBoard = (board) => {
-    return board.map((row, rowIdx) => {
+    return board.map((row, row_index) => {
       //console.log("ROW:", row);
       return (
         // <Row
         //   rowArr={row}
         //   handlePiecePick={this.handleClick}
-        //   rowIndex={rowIdx}
+        //   rowIndex={row_index}
         // />
-        <div className="row" key={`row${rowIdx}`}>
-          {row.map((column, columnIdx) => {
+        <div className="row" key={`row${row_index}`}>
+          {row.map((column, column_index) => {
             //console.log("COL:", column);
             return (
               <div
                 className="column"
                 onClick={() => {
-                  this.handleClick(rowIdx, columnIdx);
+                  this.handleClick(row_index, column_index);
                 }}
-                id={`column${columnIdx}`}
+                id={`column${column_index}`}
               >
-                {column.color === "M" && (
+                {column.color === "r" && (
                   <div className="red piece">
                     {column.isKing && <div className="king1" />}
                   </div>
                 )}
-                {column.color === "B" && (
+                {column.color === "b" && (
                   <div className="blue piece">
                     {column.isKing && <div className="king2" />}
                   </div>
@@ -252,25 +243,26 @@ export default class Board extends Component {
   };
 
   render() {
-    if (this.state.player === null) {
-      return (
-        <div className="choose">
-          <h1 className="heading">Checkers AI</h1>
-          <div className="button">
-            <button onClick={() => this.changeNumberOfPlayer(1)}>
-              1 Player
-            </button>
-            <button onClick={() => this.changeNumberOfPlayer(2)}>
-              2 Player
-            </button>
-          </div>
-        </div>
-      );
-    }
+    // if (this.state.player === null) {
+    //   return (
+    //     <div className="choose">
+    //       <h1 className="heading">Checkers AI</h1>
+    //       <div className="button">
+    //         <button onClick={() => this.changeNumberOfPlayer(1)}>
+    //           1 Player
+    //         </button>
+    //         <button onClick={() => this.changeNumberOfPlayer(2)}>
+    //           2 Player
+    //         </button>
+    //       </div>
+    //     </div>
+    //   );
+    // }
 
     if (this.state.player === 1 && this.state.level === null) {
       return (
         <div className="choose">
+          <h1 className="heading">CHECKERS AI</h1>
           <h2 class="select_level">Select Level</h2>
           <div className="button">
             <button onClick={() => this.changeLevel("Random")}>Random</button>
@@ -287,11 +279,12 @@ export default class Board extends Component {
 
     return (
       <>
+        <div className="board">{this.renderBoard(this.state.board)}</div>
         <div className="player-turn">
           <h2 className="vs-piece">
-            <span className="blue">{this.state.piecePlayerBlue}</span>
+            <span className="blue">{this.state.bluePiecesLeft}</span>
             <span> VS </span>
-            <span className="red">{this.state.piecePlayerRed}</span>
+            <span className="red">{this.state.redPiecesLeft}</span>
           </h2>
           <h2 className={`player-${this.state.turn}`}>
             {this.state.winner
@@ -307,7 +300,6 @@ export default class Board extends Component {
             New Game
           </h2>
         </div>
-        <div className="board">{this.renderBoard(this.state.board)}</div>
       </>
     );
   }

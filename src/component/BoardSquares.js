@@ -27,12 +27,12 @@ const Column = (props) => {
       data-column={props.index}
       onClick={props.handlePieceClick}
     >
-      {props.color === "M" && (
+      {props.color === "r" && (
         <div className="red piece">
           {props.isKing && <div className="king1" />}
         </div>
       )}
-      {props.color === "B" && (
+      {props.color === "b" && (
         <div className="blue piece">
           {props.isKing && <div className="king2" />}
         </div>
