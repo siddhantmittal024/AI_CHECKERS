@@ -1,15 +1,15 @@
-import execute, { getPossibleClick, numberOfKings } from "./utils";
+import { ExecuteMove, getPossibleMoves, numberOfKings } from "./utils";
 
-//Alter function executeMiniMax
+// function to ExecuteMove the selected mode
 export default function executeComputerMove(oldState) {
-  const { level } = oldState;
+  const { gameMode } = oldState;
   let depth;
-  if (level === "Random") {
+  if (gameMode === "Random") {
     return Random(oldState);
-  } else if (level === "Mini-Max") {
+  } else if (gameMode === "Mini-Max") {
     depth = 3;
     return miniMax(oldState, depth);
-  } else if (level === "Alpha-Beta") {
+  } else if (gameMode === "Alpha-Beta") {
     depth = 4;
     return alphaBetaPruning(oldState, depth, -10000, 10000);
   }
@@ -17,113 +17,118 @@ export default function executeComputerMove(oldState) {
   return oldState;
 }
 
-function Random(oldState) {
+// random function
+const Random = (oldState) => {
+  // get all possible peices that can be clicked
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("r", state.board);
+  const possibleClick = getPossibleMoves("r", state.board);
 
   if (possibleClick.length === 0) {
     return { nextState: state };
   }
 
   let possibleState = [];
-
+  // get all possible states of those pieces
   for (let ii = 0; ii < possibleClick.length; ii++) {
     const moveState = JSON.parse(JSON.stringify(state));
-    moveState.clickedNow = possibleClick[ii];
+    moveState.currentClick = possibleClick[ii];
 
-    const next = execute(moveState);
+    const next = ExecuteMove(moveState);
     const possibleJumpMove = next.possibleJumpMove;
     const possibleMove = next.possibleMove;
 
-    // check if normal move
+    // check if it is a normal move
     if (possibleJumpMove.length === 0) {
       for (let jj = 0; jj < possibleMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleMove[jj];
+        jumpState.currentClick = possibleMove[jj];
 
-        let result = execute(jumpState);
-        // add possible next state
+        let result = ExecuteMove(jumpState);
+        // add all possible next states
         possibleState.push({
           nextState: result,
         });
       }
     } else {
-      // for jump move
+      // check for jump move
 
       for (let jj = 0; jj < possibleJumpMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleJumpMove[jj];
+        jumpState.currentClick = possibleJumpMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
 
-        // check if can jump more than once
+        // check if a piece can jump more than once
         while (result.turn === 2) {
           //console.log("RESULT:", result);
-          result.clickedNow = result.possibleJumpMove[0];
-          result = execute(result);
+          result.currentClick = result.possibleJumpMove[0];
+          result = ExecuteMove(result);
         }
 
-        // add all possible move state
+        // add all possible move states
         possibleState.push({
           nextState: result,
         });
       }
     }
   }
-
+  // generate a random move
   const randomState = Math.floor(Math.random() * possibleState.length);
 
   return possibleState[randomState].nextState;
-}
+};
 
-function miniMax(oldState, depth) {
+// minimax function
+const miniMax = (oldState, depth) => {
   const nextState = max(oldState, depth);
   return nextState.nextState;
-}
+};
 
-function max(oldState, depth) {
+// max function
+const max = (oldState, depth) => {
+  // get all possible peices that can be clicked
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("r", state.board);
+  const possibleClick = getPossibleMoves("r", state.board);
 
+  // number of kings in current board state
   const kings = numberOfKings(state.board);
 
-  // check if there is not possible move
+  // check if there are no possible moves
   if (possibleClick.length === 0) {
     return { nextState: state, value: 0 };
   }
 
   let possibleState = [];
 
-  // check for all possible piece to clicked
+  // get all possible states of those pieces
   for (let ii = 0; ii < possibleClick.length; ii++) {
     const moveState = JSON.parse(JSON.stringify(state));
-    moveState.clickedNow = possibleClick[ii];
+    moveState.currentClick = possibleClick[ii];
 
-    const next = execute(moveState);
+    const next = ExecuteMove(moveState);
     const possibleJumpMove = next.possibleJumpMove;
     const possibleMove = next.possibleMove;
 
-    // check if normal move
+    // check if it is a normal move
     if (possibleJumpMove.length === 0) {
       for (let jj = 0; jj < possibleMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleMove[jj];
+        jumpState.currentClick = possibleMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerRed -
+            result.redPiecesLeft -
             kings[0] -
-            (result.piecePlayerBlue - kings[1]) +
+            (result.bluePiecesLeft - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMin = min(result, depth - 1);
 
-          // prunning
           if (resMin === undefined) {
             break;
           }
@@ -131,7 +136,7 @@ function max(oldState, depth) {
           value = resMin.value;
         }
 
-        // add possible next state
+        // add all possible next states
         possibleState.push({
           nextState: result,
           value: value,
@@ -142,30 +147,29 @@ function max(oldState, depth) {
 
       for (let jj = 0; jj < possibleJumpMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleJumpMove[jj];
+        jumpState.currentClick = possibleJumpMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
 
-        // check if can jump more than once
+        // check if a piece can jump more than once
         while (result.turn === 2) {
-          result.clickedNow = result.possibleJumpMove[0];
-          result = execute(result);
+          result.currentClick = result.possibleJumpMove[0];
+          result = ExecuteMove(result);
         }
 
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerRed -
+            result.redPiecesLeft -
             kings[0] -
-            (result.piecePlayerBlue - kings[1]) +
+            (result.bluePiecesLeft - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMin = min(result, depth - 1);
 
-          // pruning
           if (resMin === undefined) {
             break;
           }
@@ -173,7 +177,7 @@ function max(oldState, depth) {
           value = resMin.value;
         }
 
-        // add all possible move state
+        // add all possible move states
         possibleState.push({
           nextState: result,
           value: value,
@@ -181,62 +185,62 @@ function max(oldState, depth) {
       }
     }
   }
-
-  // randomize all
-  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
-  // sort descending by move value
+  // sort in descending order of score
   possibleState.sort((x, y) => {
     return y.value - x.value;
   });
 
   return possibleState[0];
-}
+};
 
-function min(oldState, depth) {
-  //console.log("min", depth, "loading");
+const min = (oldState, depth) => {
+  // console.log("min", depth, "loading");
+
+  // get all possible peices that can be clicked
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("b", state.board);
+  const possibleClick = getPossibleMoves("b", state.board);
+
+  //number of kings in current board state
   const kings = numberOfKings(state.board);
 
-  // check if there is not possible move
+  // check if there are no possible movea
   if (possibleClick.length === 0) {
     return { nextState: state, value: 0 };
   }
 
   let possibleState = [];
 
-  // check for all possible piece to clicked
+  //get all possible states of those pieces
   for (let ii = 0; ii < possibleClick.length; ii++) {
     const moveState = JSON.parse(JSON.stringify(state));
-    moveState.clickedNow = possibleClick[ii];
+    moveState.currentClick = possibleClick[ii];
 
-    const next = execute(moveState);
+    const next = ExecuteMove(moveState);
     const possibleJumpMove = next.possibleJumpMove;
     const possibleMove = next.possibleMove;
 
-    // check if normal move
+    // check if it is anormal move
     if (possibleJumpMove.length === 0) {
       for (let jj = 0; jj < possibleMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleMove[jj];
+        jumpState.currentClick = possibleMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerBlue -
+            result.bluePiecesLeft -
             kings[1] -
-            (result.piecePlayerRed - kings[0]) +
+            (result.redPiecesLeft - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMax = max(result, depth - 1);
 
-          // prunning
           if (resMax === undefined) {
             break;
           }
@@ -244,7 +248,7 @@ function min(oldState, depth) {
           value = resMax.value;
         }
 
-        // add possible next state
+        // add all possible next states
         possibleState.push({
           nextState: result,
           value: value,
@@ -256,31 +260,30 @@ function min(oldState, depth) {
       for (let jj = 0; jj < possibleJumpMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
         const [rowJump, columnJump] = possibleJumpMove[jj];
-        jumpState.clickedNow = [rowJump, columnJump];
+        jumpState.currentClick = [rowJump, columnJump];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
 
-        // check if can jump more than once
+        // check if a piece can jump more than once
 
         while (result.turn === 1) {
-          result.clickedNow = result.possibleJumpMove[0];
-          result = execute(result);
+          result.currentClick = result.possibleJumpMove[0];
+          result = ExecuteMove(result);
         }
 
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerBlue -
+            result.bluePiecesLeft -
             kings[1] -
-            (result.piecePlayerRed - kings[0]) +
+            (result.redPiecesLeft - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMax = max(result, depth - 1);
 
-          // pruning
           if (resMax === undefined) {
             break;
           }
@@ -288,7 +291,7 @@ function min(oldState, depth) {
           value = resMax.value;
         }
 
-        // add all possible move state
+        // add all possible move states
         possibleState.push({
           nextState: result,
           value: value,
@@ -297,78 +300,77 @@ function min(oldState, depth) {
     }
   }
 
-  // randomize all
-  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
-  // sort ascending by move value
+  // sort in ascending order of score
   possibleState.sort((x, y) => {
     return x.value - y.value;
   });
 
   return possibleState[0];
-}
+};
 
-function alphaBetaPruning(oldState, depth, Alpha, Beta) {
+// alpha beta pruning
+const alphaBetaPruning = (oldState, depth, Alpha, Beta) => {
   const nextState = alphaMax(oldState, depth, Alpha, Beta);
   return nextState.nextState;
-}
-//ADD RANDOM FUNCTION
-//ADD ALPHA BETA PRUNING
+};
 
-//function maxMiniMax(oldState, depth) {}
-function alphaMax(oldState, depth = 0, alpha, beta) {
-  //console.log("max", depth, "loading");
+// alphaMax function
+const alphaMax = (oldState, depth = 0, alpha, beta) => {
+  // console.log("max", depth, "loading");
+
+  // get all possible peices that can be clicked
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("r", state.board);
+  const possibleClick = getPossibleMoves("r", state.board);
+
+  // number of kings in current board state
   const kings = numberOfKings(state.board);
 
-  // check if there is not possible move
+  // check if there are no possible moves
   if (possibleClick.length === 0) {
     return { nextState: state, value: 0 };
   }
 
   let possibleState = [];
 
-  // check for all possible piece to clicked
+  // get all possible states of those pieces
   for (let ii = 0; ii < possibleClick.length; ii++) {
     const moveState = JSON.parse(JSON.stringify(state));
-    moveState.clickedNow = possibleClick[ii];
+    moveState.currentClick = possibleClick[ii];
 
-    const next = execute(moveState);
+    const next = ExecuteMove(moveState);
     const possibleJumpMove = next.possibleJumpMove;
     const possibleMove = next.possibleMove;
 
-    // check if normal move
+    // check if it is a normal move
     if (possibleJumpMove.length === 0) {
       for (let jj = 0; jj < possibleMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleMove[jj];
+        jumpState.currentClick = possibleMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerRed -
+            result.redPiecesLeft -
             kings[0] -
-            (result.piecePlayerBlue - kings[1]) +
+            (result.bluePiecesLeft - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMin = alphaMin(result, depth - 1, alpha, beta);
 
-          // prunning
           if (resMin === undefined) {
             break;
           }
 
           value = resMin.value;
         }
-        // prunning
 
-        //67-74 I think we can remove to make it purely min-max
+        // prunning
         if (value > alpha) {
           alpha = value;
         }
@@ -377,7 +379,7 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
           break;
         }
 
-        // add possible next state
+        // add all possible next states
         possibleState.push({
           nextState: result,
           value: value,
@@ -388,31 +390,30 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
 
       for (let jj = 0; jj < possibleJumpMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleJumpMove[jj];
+        jumpState.currentClick = possibleJumpMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
 
-        // check if can jump more than once
+        // check if the piece can jump more than once
         while (result.turn === 2) {
           //console.log("RESULT:", result);
-          result.clickedNow = result.possibleJumpMove[0];
-          result = execute(result);
+          result.currentClick = result.possibleJumpMove[0];
+          result = ExecuteMove(result);
         }
 
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerRed -
+            result.redPiecesLeft -
             kings[0] -
-            (result.piecePlayerBlue - kings[1]) +
+            (result.bluePiecesLeft - kings[1]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMin = alphaMin(result, depth - 1, alpha, beta);
 
-          // pruning
           if (resMin === undefined) {
             break;
           }
@@ -421,7 +422,6 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
         }
 
         // pruning
-        //Lines 115-121 can be removes to make it purely min-max
         if (value > alpha) {
           alpha = value;
         }
@@ -430,7 +430,7 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
           break;
         }
 
-        // add all possible move state
+        // add all possible move states
         possibleState.push({
           nextState: result,
           value: value,
@@ -438,62 +438,63 @@ function alphaMax(oldState, depth = 0, alpha, beta) {
       }
     }
   }
-
-  // randomize all
-  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
-  // sort descending by move value
+  // sort in descending order of score
   possibleState.sort((x, y) => {
     return y.value - x.value;
   });
 
   return possibleState[0];
-}
+};
 
-function alphaMin(oldState, depth = 0, alpha, beta) {
+//alphaMin function
+const alphaMin = (oldState, depth = 0, alpha, beta) => {
   //console.log("min", depth, "loading");
+
+  //get all possible peices that can be clicked
   const state = JSON.parse(JSON.stringify(oldState));
-  const possibleClick = getPossibleClick("b", state.board);
+  const possibleClick = getPossibleMoves("b", state.board);
+
+  //number of kings in current board state
   const kings = numberOfKings(state.board);
 
-  // check if there is not possible move
+  // check if there are no possible moves
   if (possibleClick.length === 0) {
     return { nextState: state, value: 0 };
   }
 
   let possibleState = [];
 
-  // check for all possible piece to clicked
+  // get all possible states of those pieces
   for (let ii = 0; ii < possibleClick.length; ii++) {
     const moveState = JSON.parse(JSON.stringify(state));
-    moveState.clickedNow = possibleClick[ii];
+    moveState.currentClick = possibleClick[ii];
 
-    const next = execute(moveState);
+    const next = ExecuteMove(moveState);
     const possibleJumpMove = next.possibleJumpMove;
     const possibleMove = next.possibleMove;
 
-    // check if normal move
+    // check if it is a normal move
     if (possibleJumpMove.length === 0) {
       for (let jj = 0; jj < possibleMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
-        jumpState.clickedNow = possibleMove[jj];
+        jumpState.currentClick = possibleMove[jj];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerBlue -
+            result.bluePiecesLeft -
             kings[1] -
-            (result.piecePlayerRed - kings[0]) +
+            (result.redPiecesLeft - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMax = alphaMax(result, depth - 1, alpha, beta);
 
-          // prunning
           if (resMax === undefined) {
             break;
           }
@@ -502,7 +503,6 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
         }
 
         // prunning
-        //remove lines 189-197 to make it min-max
         if (value < beta) {
           beta = value;
         }
@@ -511,7 +511,7 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
           break;
         }
 
-        // add possible next state
+        // add all possible next states
         possibleState.push({
           nextState: result,
           value: value,
@@ -523,31 +523,30 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
       for (let jj = 0; jj < possibleJumpMove.length; jj++) {
         const jumpState = JSON.parse(JSON.stringify(next));
         const [rowJump, columnJump] = possibleJumpMove[jj];
-        jumpState.clickedNow = [rowJump, columnJump];
+        jumpState.currentClick = [rowJump, columnJump];
 
-        let result = execute(jumpState);
+        let result = ExecuteMove(jumpState);
 
-        // check if can jump more than once
+        // check the piece can jump more than once
 
         while (result.turn === 1) {
-          result.clickedNow = result.possibleJumpMove[0];
-          result = execute(result);
+          result.currentClick = result.possibleJumpMove[0];
+          result = ExecuteMove(result);
         }
 
         let value;
 
-        // set value
+        // calculate score
         if (depth === 0) {
           value =
-            result.piecePlayerBlue -
+            result.bluePiecesLeft -
             kings[1] -
-            (result.piecePlayerRed - kings[0]) +
+            (result.redPiecesLeft - kings[0]) +
             kings[0] * 2 -
             kings[1] * 2;
         } else {
           const resMax = alphaMax(result, depth - 1, alpha, beta);
 
-          // pruning
           if (resMax === undefined) {
             break;
           }
@@ -564,7 +563,7 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
           break;
         }
 
-        // add all possible move state
+        // add all possible move states
         possibleState.push({
           nextState: result,
           value: value,
@@ -573,14 +572,12 @@ function alphaMin(oldState, depth = 0, alpha, beta) {
     }
   }
 
-  // randomize all
-  //MAYBE WE CAN USE THIS TO IMPLEMENT RANDOM FUNCTION
   possibleState.sort(() => Math.round(Math.random()) * 2 - 1);
 
-  // sort ascending by move value
+  // sort in ascending order of score
   possibleState.sort((x, y) => {
     return x.value - y.value;
   });
 
   return possibleState[0];
-}
+};
