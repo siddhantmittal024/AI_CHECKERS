@@ -93,16 +93,17 @@ export default class Board extends Component {
     //declaring the winner after checking the conditons if any one of them passes
     //For draw condition we check if in past 50 moves no king was made or no pieces were eleminated of either of the players
     if (bluePiecesLeft === 0) {
-      await this.setState({ winner: "Player 2" });
+      await this.setState({ winner: "Player 2 Win!!"  });
       return true;
     } else if (redPiecesLeft === 0) {
-      await this.setState({ winner: "Player 1" });
+      await this.setState({ winner: "Player 1 Win!!" });
       return true;
     } else if (possibleClick.length === 0) {
-      await this.setState({ winner: turn === 1 ? "Player 2" : "Player 1" });
+      await this.setState({ winner: turn === 1 ? "Player 2 Win!!" : "Player 1 Win!!" });
       return true;
     } else if (this.state.checkNumberForDrawMoves / 2 === 50) {
       await this.setState({ winner: "DRAW" });
+      return true;
     }
     return false;
   };
@@ -221,7 +222,7 @@ export default class Board extends Component {
         <div className="player-turn-1">
           <h2 className={`player-${this.state.turn}`}>
             {this.state.winner
-              ? `${this.state.winner} Win!!`
+              ? `${this.state.winner}`
               : `Player ${this.state.turn}'s Turn`}
           </h2>
         </div>

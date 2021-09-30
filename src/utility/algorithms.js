@@ -7,7 +7,7 @@ export default function executeComputerMove(oldState) {
   if (gameMode === "Random") {
     return Random(oldState);
   } else if (gameMode === "Mini-Max") {
-    depth = 3;
+    depth = 4;
     return miniMax(oldState, depth);
   } else if (gameMode === "Alpha-Beta") {
     depth = 4;
