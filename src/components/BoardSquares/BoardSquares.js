@@ -1,5 +1,5 @@
-import React from "react";
 import GamePiece from "../BoardPieces/piece";
+import React from "react";
 
 // board structure
 export const InitialGameBoard = [

@@ -13,7 +13,7 @@ export default function executeComputerMove(oldState) {
     depth = 4;
     return alphaBetaPruning(oldState, depth, -10000, 10000);
   }
-
+  
   return oldState;
 }
 

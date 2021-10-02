@@ -1,8 +1,8 @@
-import React, { Component } from "react";
 import { ExecuteMove, getPossibleMoves } from "../../utility/utils";
 import "./board.css";
 import executeComputerMove from "../../utility/algorithms";
 import { InitialGameBoard } from "../BoardSquares/BoardSquares";
+import React, { Component } from "react";
 
 //this file contains our entire board state, some helper functions to instantiate the game and also the redering of entire UI
 
@@ -17,7 +17,7 @@ export default class Board extends Component {
     bluePiecesLeft: 12, //number of blue pieces
     redPiecesLeft: 12, //number of red pieces
     winner: "", //store the winner
-    player: 1, //make it null to make it a 2 player game
+    player: null, //make it null to make it a 2 player game
     gameMode: null, //set the level of the game (basically to decide what algo to play against)
     board: InitialGameBoard, //setting up our initial board
     numberOfMoves: 0, //total number of moves in a single game
@@ -181,22 +181,22 @@ export default class Board extends Component {
 
   //rendering our homepage, board and all other required components
   render() {
-    console.log("state:", this.state);
-    // if (this.state.player === null) {
-    //   return (
-    //     <div className="choose">
-    //       <h1 className="heading">Checkers AI</h1>
-    //       <div className="button">
-    //         <button onClick={() => this.changeNumberOfPlayer(1)}>
-    //           1 Player
-    //         </button>
-    //         <button onClick={() => this.changeNumberOfPlayer(2)}>
-    //           2 Player
-    //         </button>
-    //       </div>
-    //     </div>
-    //   );
-    // }
+    //console.log("state:", this.state);
+    if (this.state.player === null) {
+      return (
+        <div className="choose">
+          <h1 className="heading1">Checkers AI</h1>
+          <div className="button">
+            <button onClick={() => this.changeNumberOfPlayer(1)}>
+              1 Player
+            </button>
+            <button onClick={() => this.changeNumberOfPlayer(2)}>
+              2 Player
+            </button>
+          </div>
+        </div>
+      );
+    }
     //Div to choose the level or mode
     if (this.state.player === 1 && this.state.gameMode === null) {
       return (
