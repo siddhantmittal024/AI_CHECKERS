@@ -1,3 +1,3 @@
 # AI_CHECKER
 
-Visit Here: checkers-ai.netlify.app/
+Checkout Here: https://checkers-ai.netlify.app/
